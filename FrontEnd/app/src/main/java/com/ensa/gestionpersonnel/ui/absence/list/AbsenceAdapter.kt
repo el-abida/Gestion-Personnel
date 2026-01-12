@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.ensa.gestionpersonnel.R
-import com.ensa.gestionpersonnel.data.local.PersonnelLocalStorage
 import com.ensa.gestionpersonnel.databinding.ItemAbsenceBinding
 import com.ensa.gestionpersonnel.domain.model.Absence
 import com.ensa.gestionpersonnel.domain.model.AbsenceType
@@ -97,19 +96,30 @@ class AbsenceAdapter(
 
                 tvMotif.text = absence.motif ?: "Aucun motif"
 
-                // Recharger le solde du personnel à chaque affichage
-                updatePersonnelSolde(absence.personnelId)
+                if (absence.personnelSolde != null) {
+                    tvSoldeConges.visibility = View.VISIBLE
+                    tvSoldeConges.text = "💼 Solde: ${absence.personnelSolde} j"
+                    val color = when {
+                        absence.personnelSolde < 5 -> android.R.color.holo_red_dark
+                        absence.personnelSolde < 15 -> android.R.color.holo_orange_dark
+                        else -> android.R.color.holo_green_dark
+                    }
+                    tvSoldeConges.setTextColor(root.context.getColor(color))
+                } else {
+                    tvSoldeConges.visibility = View.GONE
+                }
 
                 // Badge de statut
                 if (absence.estValideeParAdmin) {
                     tvStatus.text = "✅ Validée"
                     tvStatus.setBackgroundResource(R.drawable.bg_status_validated)
                     tvStatus.setTextColor(root.context.getColor(android.R.color.white))
-                    btnValidate.text = "Invalider"
+                    btnValidate.visibility = View.GONE
                 } else {
                     tvStatus.text = "⏳ En attente"
                     tvStatus.setBackgroundResource(R.drawable.bg_status_pending)
                     tvStatus.setTextColor(root.context.getColor(android.R.color.white))
+                    btnValidate.visibility = View.VISIBLE
                     btnValidate.text = "Valider"
                 }
 
@@ -121,40 +131,18 @@ class AbsenceAdapter(
                     tvJustificatif.visibility = View.GONE
                 }
 
-                // Badge de pénalité pour absences non justifiées VALIDÉES
+                // Information de déduction pour absences non justifiées VALIDÉES
                 if (absence.type == AbsenceType.NON_JUSTIFIEE && absence.estValideeParAdmin) {
                     layoutPenalite.visibility = View.VISIBLE
-                    val penalite = duree * 2
-                    tvPenaliteInfo.text = "Pénalité: $penalite jours déduits du solde"
+                    tvPenaliteInfo.text = "Info: $duree jours déduits du solde"
+                    layoutPenalite.setBackgroundColor(root.context.getColor(R.color.gray_light))
+                    tvPenaliteInfo.setTextColor(root.context.getColor(R.color.gray_dark))
                 } else {
                     layoutPenalite.visibility = View.GONE
                 }
             }
         }
 
-        private fun updatePersonnelSolde(personnelId: Long) {
-            binding.apply {
-                // Recharger le personnel depuis le storage
-                val personnel = PersonnelLocalStorage.getPersonnelById(personnelId)
-
-                android.util.Log.d("AbsenceAdapter", "Solde pour personnel $personnelId: ${personnel?.soldeConges ?: "NULL"}")
-
-                if (personnel != null) {
-                    tvSoldeConges.visibility = View.VISIBLE
-                    tvSoldeConges.text = "💼 Solde: ${personnel.soldeConges} jours"
-
-                    // Couleur selon le solde
-                    val color = when {
-                        personnel.soldeConges < 5 -> android.R.color.holo_red_dark
-                        personnel.soldeConges < 15 -> android.R.color.holo_orange_dark
-                        else -> android.R.color.holo_green_dark
-                    }
-                    tvSoldeConges.setTextColor(root.context.getColor(color))
-                } else {
-                    tvSoldeConges.visibility = View.GONE
-                }
-            }
-        }
     }
 
     class AbsenceDiffCallback : DiffUtil.ItemCallback<Absence>() {

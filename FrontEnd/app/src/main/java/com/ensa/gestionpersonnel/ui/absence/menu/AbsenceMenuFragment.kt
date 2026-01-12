@@ -52,8 +52,8 @@ class AbsenceMenuFragment : Fragment() {
             findNavController().navigate(R.id.action_absenceMenu_to_absenceNonJustifieeList)
         }
 
-        // Option 4: Gérer les absences maladie (remplace ordres de mission)
-        binding.cardOrdresMission.setOnClickListener {
+        // Option 4: Gérer les absences maladie
+        binding.cardMaladie.setOnClickListener {
             findNavController().navigate(R.id.action_absenceMenu_to_absenceMaladieList)
         }
     }

@@ -15,6 +15,8 @@ import com.ensa.gestionpersonnel.data.repository.MissionRepository
 import com.ensa.gestionpersonnel.data.repository.PersonnelRepository
 import com.ensa.gestionpersonnel.data.remote.api.AvancementApi
 import com.ensa.gestionpersonnel.data.remote.api.MissionApi
+import com.ensa.gestionpersonnel.data.remote.api.AbsenceApi
+import com.ensa.gestionpersonnel.data.repository.AbsenceRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -76,5 +78,11 @@ object RepositoryModule {
     @Singleton
     fun provideAvancementRepository(avancementApi: AvancementApi): AvancementRepository {
         return AvancementRepository(avancementApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAbsenceRepository(absenceApi: AbsenceApi): AbsenceRepository {
+        return AbsenceRepository(absenceApi)
     }
 }

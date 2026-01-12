@@ -157,8 +157,7 @@ class AbsenceListFragment : Fragment() {
                         absences
                     }
 
-                    // Forcer le rafraîchissement complet
-                    absenceAdapter.submitList(null)
+                    // Mettre à jour la liste directement
                     absenceAdapter.submitList(filteredAbsences.toList())
 
                     binding.tvEmptyState.visibility = if (filteredAbsences.isEmpty()) {
@@ -214,27 +213,32 @@ class AbsenceListFragment : Fragment() {
     }
 
     private fun setupSearch() {
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean = false
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                viewModel.searchAbsences(newText ?: "")
-                return true
+        binding.etSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.searchAbsences(s?.toString() ?: "")
             }
+            override fun afterTextChanged(s: android.text.Editable?) {}
         })
     }
 
     private fun showValidationDialog(absence: Absence) {
-        val action = if (absence.estValideeParAdmin) "Invalider" else "Valider"
-        val message = "Voulez-vous $action cette absence de " +
-                "${absence.personnelPrenom} ${absence.personnelNom} ?"
+        if (absence.estValideeParAdmin) {
+            Snackbar.make(binding.root, "Cette absence est déjà validée", Snackbar.LENGTH_SHORT).show()
+            return
+        }
+
+        val action = "Valider"
+        val message = "Voulez-vous valider cette absence de " +
+                "${absence.personnelPrenom} ${absence.personnelNom} ?\n" +
+                "Cette action déduira également le solde de congés si applicable."
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("$action l'absence")
             .setMessage(message)
             .setPositiveButton(action) { _, _ ->
                 absence.id?.let { id ->
-                    viewModel.validateAbsence(id, !absence.estValideeParAdmin)
+                    viewModel.validateAbsence(id)
                 }
             }
             .setNegativeButton("Annuler", null)

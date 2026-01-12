@@ -185,6 +185,14 @@ class AbsenceFormFragment : Fragment() {
             }
         }
 
+        // Observer la liste des absences pour l'édition
+        absenceViewModel.absences.observe(viewLifecycleOwner) { result ->
+            if (absenceId != 0L && result is NetworkResult.Success<*>) {
+                val absence = (result.data as? List<Absence>)?.find { it.id == absenceId }
+                absence?.let { preFillForm(it) }
+            }
+        }
+
         // Observer les opérations sur les absences
         absenceViewModel.absenceOperation.observe(viewLifecycleOwner) { result ->
             when (result) {
@@ -267,8 +275,31 @@ class AbsenceFormFragment : Fragment() {
     }
 
     private fun loadAbsenceData() {
-        // TODO: Implémenter le chargement d'une absence existante
-        // Nécessite d'ajouter une méthode dans le repository
+        absenceViewModel.loadAllAbsences()
+    }
+
+    private fun preFillForm(absence: Absence) {
+        dateDebut = absence.dateDebut
+        dateFin = absence.dateFin
+        binding.etDateDebut.setText(dateFormat.format(absence.dateDebut))
+        binding.etDateFin.setText(dateFormat.format(absence.dateFin))
+        binding.etMotif.setText(absence.motif)
+        
+        // Sélectionner le type
+        val typePosition = AbsenceType.values().indexOf(absence.type)
+        if (typePosition >= 0) {
+            binding.spinnerType.setSelection(typePosition)
+        }
+
+        // Le personnel sera sélectionné via l'observeur personnelListState
+        // car on a l'ID dans l'objet absence
+        val pId = absence.personnelId
+        val position = personnelList.indexOfFirst { it.id == pId }
+        if (position >= 0) {
+            binding.spinnerPersonnel.setSelection(position + 1)
+        }
+        
+        updateDuration()
     }
 
     private fun showDatePicker(onDateSelected: (Date) -> Unit) {

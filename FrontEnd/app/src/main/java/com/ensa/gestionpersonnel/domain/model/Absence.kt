@@ -12,9 +12,10 @@ enum class AbsenceType {
 data class Absence(
     val id: Long? = null,
     val personnelId: Long,
-    val personnelNom: String,
-    val personnelPrenom: String,
-    val personnelPpr: String,
+    val personnelNom: String?,
+    val personnelPrenom: String?,
+    val personnelPpr: String?,
+    val personnelSolde: Int? = null,
     val dateDebut: Date,
     val dateFin: Date,
     val type: AbsenceType,

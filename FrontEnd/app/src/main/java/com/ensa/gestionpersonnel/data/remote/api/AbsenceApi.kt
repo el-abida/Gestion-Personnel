@@ -1,27 +1,29 @@
 package com.ensa.gestionpersonnel.data.remote.api
 
-import com.ensa.gestionpersonnel.data.remote.dto.AbsenceRequest
-import com.ensa.gestionpersonnel.data.remote.dto.AbsenceResponse
+import com.ensa.gestionpersonnel.data.remote.dto.AbsenceDto
 import retrofit2.Response
 import retrofit2.http.*
 
 interface AbsenceApi {
 
-    @GET("api/absences")
-    suspend fun getAllAbsences(): List<AbsenceResponse>
+    @GET("absences")
+    suspend fun getAllAbsences(): Response<List<AbsenceDto>>
 
-    @GET("api/personnel/{personnelId}/absences")
-    suspend fun getAbsencesByPersonnel(@Path("personnelId") personnelId: Long): List<AbsenceResponse>
+    @GET("absences/{id}")
+    suspend fun getAbsenceById(@Path("id") id: Long): Response<AbsenceDto>
 
-    @POST("api/absences")
-    suspend fun createAbsence(@Body request: AbsenceRequest): AbsenceResponse
+    @GET("absences/personnel/{personnelId}")
+    suspend fun getAbsencesByPersonnelId(@Path("personnelId") personnelId: Long): Response<List<AbsenceDto>>
 
-    @PUT("api/absences/{id}")
-    suspend fun updateAbsence(@Path("id") id: Long, @Body request: AbsenceRequest): AbsenceResponse
+    @POST("absences")
+    suspend fun createAbsence(@Body absenceDto: AbsenceDto): Response<AbsenceDto>
 
-    @PATCH("api/absences/{id}/validate")
-    suspend fun validateAbsence(@Path("id") id: Long, @Query("validate") validate: Boolean): AbsenceResponse
+    @PUT("absences/{id}")
+    suspend fun updateAbsence(@Path("id") id: Long, @Body absenceDto: AbsenceDto): Response<AbsenceDto>
 
-    @DELETE("api/absences/{id}")
+    @PUT("absences/{id}/validate")
+    suspend fun validateAbsence(@Path("id") id: Long): Response<AbsenceDto>
+
+    @DELETE("absences/{id}")
     suspend fun deleteAbsence(@Path("id") id: Long): Response<Unit>
 }

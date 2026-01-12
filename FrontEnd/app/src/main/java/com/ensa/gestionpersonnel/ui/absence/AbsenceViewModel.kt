@@ -43,15 +43,15 @@ class AbsenceViewModel @Inject constructor(
                 absenceRepository.getAllAbsences().collect { result ->
                     _absences.value = result
                     when (result) {
-                        is NetworkResult.Success -> {
-                            _filteredAbsences.value = result.data ?: emptyList()
+                        is NetworkResult.Success<*> -> {
+                            _filteredAbsences.value = (result.data as? List<Absence>) ?: emptyList()
                             _isLoading.value = false
                         }
-                        is NetworkResult.Error -> {
+                        is NetworkResult.Error<*> -> {
                             _filteredAbsences.value = emptyList()
                             _isLoading.value = false
                         }
-                        is NetworkResult.Loading -> {
+                        is NetworkResult.Loading<*> -> {
                             _isLoading.value = true
                         }
                     }
@@ -71,15 +71,15 @@ class AbsenceViewModel @Inject constructor(
                 absenceRepository.getAbsencesByPersonnel(personnelId).collect { result ->
                     _absences.value = result
                     when (result) {
-                        is NetworkResult.Success -> {
-                            _filteredAbsences.value = result.data ?: emptyList()
+                        is NetworkResult.Success<*> -> {
+                            _filteredAbsences.value = (result.data as? List<Absence>) ?: emptyList()
                             _isLoading.value = false
                         }
-                        is NetworkResult.Error -> {
+                        is NetworkResult.Error<*> -> {
                             _filteredAbsences.value = emptyList()
                             _isLoading.value = false
                         }
-                        is NetworkResult.Loading -> {
+                        is NetworkResult.Loading<*> -> {
                             _isLoading.value = true
                         }
                     }
@@ -97,14 +97,15 @@ class AbsenceViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 absenceRepository.createAbsence(absence).collect { result ->
-                    _absenceOperation.value = result as NetworkResult<Absence?>?
+                    _absenceOperation.value = result as? NetworkResult<Absence?>
                     _isLoading.value = false
-                    if (result is NetworkResult.Success && result.data != null) {
+                    if (result is NetworkResult.Success<*> && result.data != null) {
+                        val data = result.data as? Absence ?: return@collect
                         // Recharger la liste après création
                         val currentAbsences = _absences.value
-                        if (currentAbsences is NetworkResult.Success) {
-                            val newList = currentAbsences.data?.toMutableList() ?: mutableListOf()
-                            newList.add(result.data)
+                        if (currentAbsences is NetworkResult.Success<*>) {
+                            val newList = (currentAbsences.data as? List<Absence>)?.toMutableList() ?: mutableListOf()
+                            newList.add(data)
                             _absences.value = NetworkResult.Success(newList)
                             _filteredAbsences.value = newList
                         } else {
@@ -124,14 +125,15 @@ class AbsenceViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 absenceRepository.updateAbsence(absence).collect { result ->
-                    _absenceOperation.value = result as NetworkResult<Absence?>?
+                    _absenceOperation.value = result as? NetworkResult<Absence?>
                     _isLoading.value = false
-                    if (result is NetworkResult.Success && result.data != null) {
+                    if (result is NetworkResult.Success<*> && result.data != null) {
+                        val data = result.data as? Absence ?: return@collect
                         // Mettre à jour l'absence dans la liste
                         val currentAbsences = _absences.value
-                        if (currentAbsences is NetworkResult.Success) {
-                            val updatedList = currentAbsences.data?.map { existingAbsence ->
-                                if (existingAbsence.id == absence.id) result.data else existingAbsence
+                        if (currentAbsences is NetworkResult.Success<*>) {
+                            val updatedList = (currentAbsences.data as? List<Absence>)?.map { existingAbsence ->
+                                if (existingAbsence.id == absence.id) data else existingAbsence
                             } ?: emptyList()
                             _absences.value = NetworkResult.Success(updatedList)
                             _filteredAbsences.value = updatedList
@@ -145,19 +147,20 @@ class AbsenceViewModel @Inject constructor(
         }
     }
 
-    fun validateAbsence(absenceId: Long, validate: Boolean) {
+    fun validateAbsence(absenceId: Long) {
         _isLoading.value = true
         viewModelScope.launch {
             try {
-                absenceRepository.validateAbsence(absenceId, validate).collect { result ->
-                    _absenceOperation.value = result as NetworkResult<Absence?>?
+                absenceRepository.validateAbsence(absenceId).collect { result ->
+                    _absenceOperation.value = result as? NetworkResult<Absence?>
                     _isLoading.value = false
-                    if (result is NetworkResult.Success && result.data != null) {
+                    if (result is NetworkResult.Success<*> && result.data != null) {
+                        val data = result.data as? Absence ?: return@collect
                         // Mettre à jour l'absence dans la liste
                         val currentAbsences = _absences.value
-                        if (currentAbsences is NetworkResult.Success) {
-                            val updatedList = currentAbsences.data?.map { existingAbsence ->
-                                if (existingAbsence.id == absenceId) result.data else existingAbsence
+                        if (currentAbsences is NetworkResult.Success<*>) {
+                            val updatedList = (currentAbsences.data as? List<Absence>)?.map { existingAbsence ->
+                                if (existingAbsence.id == absenceId) data else existingAbsence
                             } ?: emptyList()
                             _absences.value = NetworkResult.Success(updatedList)
                             _filteredAbsences.value = updatedList
@@ -178,16 +181,16 @@ class AbsenceViewModel @Inject constructor(
                 absenceRepository.deleteAbsence(absenceId).collect { result ->
                     _isLoading.value = false
                     _absenceOperation.value = when (result) {
-                        is NetworkResult.Success -> NetworkResult.Success(null)
-                        is NetworkResult.Error -> result
-                        is NetworkResult.Loading -> result
-                    } as NetworkResult<Absence?>?
+                        is NetworkResult.Success<*> -> NetworkResult.Success(null)
+                        is NetworkResult.Error<*> -> NetworkResult.Error(result.message ?: "Erreur")
+                        is NetworkResult.Loading<*> -> NetworkResult.Loading()
+                    }
 
-                    if (result is NetworkResult.Success && result.data == true) {
+                    if (result is NetworkResult.Success<*>) {
                         // Supprimer l'absence de la liste
                         val currentAbsences = _absences.value
-                        if (currentAbsences is NetworkResult.Success) {
-                            val filteredList = currentAbsences.data?.filter { it.id != absenceId } ?: emptyList()
+                        if (currentAbsences is NetworkResult.Success<*>) {
+                            val filteredList = (currentAbsences.data as? List<Absence>)?.filter { it.id != absenceId } ?: emptyList()
                             _absences.value = NetworkResult.Success(filteredList)
                             _filteredAbsences.value = filteredList
                         }
@@ -215,13 +218,11 @@ class AbsenceViewModel @Inject constructor(
 
     fun clearFilters() {
         _currentFilterType.value = null
-        when (val currentAbsences = _absences.value) {
-            is NetworkResult.Success -> {
-                _filteredAbsences.value = currentAbsences.data ?: emptyList()
-            }
-            else -> {
-                _filteredAbsences.value = emptyList()
-            }
+        val currentAbsences = _absences.value
+        if (currentAbsences is NetworkResult.Success<*>) {
+            _filteredAbsences.value = (currentAbsences.data as? List<Absence>) ?: emptyList()
+        } else {
+            _filteredAbsences.value = emptyList()
         }
     }
 
@@ -230,36 +231,34 @@ class AbsenceViewModel @Inject constructor(
         validated: Boolean? = null,
         searchQuery: String? = null
     ) {
-        when (val currentAbsences = _absences.value) {
-            is NetworkResult.Success -> {
-                val data = currentAbsences.data ?: emptyList()
-                var filtered = data
+        val currentAbsences = _absences.value
+        if (currentAbsences is NetworkResult.Success<*>) {
+            val data = (currentAbsences.data as? List<Absence>) ?: emptyList()
+            var filtered = data
 
-                // Appliquer le filtre par type
-                if (type != null) {
-                    filtered = filtered.filter { it.type.name == type }
-                }
-
-                // Appliquer le filtre par statut de validation
-                if (validated != null) {
-                    filtered = filtered.filter { it.estValideeParAdmin == validated }
-                }
-
-                // Appliquer la recherche
-                if (!searchQuery.isNullOrBlank()) {
-                    filtered = filtered.filter { absence ->
-                        absence.personnelNom.contains(searchQuery, ignoreCase = true) ||
-                                absence.personnelPrenom.contains(searchQuery, ignoreCase = true) ||
-                                absence.personnelPpr.contains(searchQuery, ignoreCase = true) ||
-                                absence.motif?.contains(searchQuery, ignoreCase = true) == true
-                    }
-                }
-
-                _filteredAbsences.value = filtered
+            // Appliquer le filtre par type
+            if (type != null) {
+                filtered = filtered.filter { it.type.name == type }
             }
-            else -> {
-                _filteredAbsences.value = emptyList()
+
+            // Appliquer le filtre par statut de validation
+            if (validated != null) {
+                filtered = filtered.filter { it.estValideeParAdmin == validated }
             }
+
+            // Appliquer la recherche
+            if (!searchQuery.isNullOrBlank()) {
+                filtered = filtered.filter { absence ->
+                    absence.personnelNom?.contains(searchQuery, ignoreCase = true) == true ||
+                            absence.personnelPrenom?.contains(searchQuery, ignoreCase = true) == true ||
+                            absence.personnelPpr?.contains(searchQuery, ignoreCase = true) == true ||
+                            absence.motif?.contains(searchQuery, ignoreCase = true) == true
+                }
+            }
+
+            _filteredAbsences.value = filtered
+        } else {
+            _filteredAbsences.value = emptyList()
         }
     }
 }
