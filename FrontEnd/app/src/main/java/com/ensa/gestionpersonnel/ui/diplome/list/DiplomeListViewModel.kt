@@ -4,17 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ensa.gestionpersonnel.data.local.DiplomeLocalStorage
+import com.ensa.gestionpersonnel.data.repository.DiplomeRepository
 import com.ensa.gestionpersonnel.domain.model.Diplome
+import com.ensa.gestionpersonnel.utils.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class DiplomeListViewModel @Inject constructor(
-    private val diplomeStorage: DiplomeLocalStorage
+    private val diplomeRepository: DiplomeRepository
 ) : ViewModel() {
 
     private val _diplomes = MutableLiveData<List<Diplome>>()
@@ -23,39 +23,57 @@ class DiplomeListViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    private val _error = MutableLiveData<String?>()
+    val error: LiveData<String?> = _error
+
+    private var allDiplomesCache: List<Diplome> = emptyList()
+
     fun loadDiplomes() {
         viewModelScope.launch {
-            _isLoading.value = true
-            val result = withContext(Dispatchers.IO) {
-                diplomeStorage.getAllDiplomes()
+            diplomeRepository.getAllDiplomes().collect { result ->
+                when (result) {
+                    is NetworkResult.Loading<*> -> _isLoading.value = true
+                    is NetworkResult.Success<*> -> {
+                        _isLoading.value = false
+                        val list = (result.data as? List<Diplome>) ?: emptyList()
+                        allDiplomesCache = list
+                        _diplomes.value = list.sortedByDescending { it.dateObtention }
+                    }
+                    is NetworkResult.Error<*> -> {
+                        _isLoading.value = false
+                        _error.value = result.message
+                    }
+                }
             }
-            _diplomes.value = result.sortedByDescending { it.dateObtention }
-            _isLoading.value = false
         }
     }
 
     fun deleteDiplome(id: Long) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                diplomeStorage.deleteDiplome(id)
+            diplomeRepository.deleteDiplome(id).collect { result ->
+                if (result is NetworkResult.Success<*>) {
+                    loadDiplomes()
+                } else if (result is NetworkResult.Error<*>) {
+                    _error.value = result.message
+                }
             }
-            loadDiplomes()
         }
     }
 
     fun searchDiplomes(query: String) {
-        viewModelScope.launch {
-            val allDiplomes = withContext(Dispatchers.IO) {
-                diplomeStorage.getAllDiplomes()
-            }
-
-            val filtered = allDiplomes.filter {
-                it.intitule.contains(query, ignoreCase = true) ||
-                        it.specialite.contains(query, ignoreCase = true) ||
-                        it.etablissement.contains(query, ignoreCase = true)
-            }
-
-            _diplomes.value = filtered.sortedByDescending { it.dateObtention }
+        if (query.isBlank()) {
+            _diplomes.value = allDiplomesCache.sortedByDescending { it.dateObtention }
+            return
         }
+
+        val filtered = allDiplomesCache.filter {
+            it.intitule.contains(query, ignoreCase = true) ||
+                    it.specialite.contains(query, ignoreCase = true) ||
+                    it.etablissement.contains(query, ignoreCase = true) ||
+                    (it.personnelNom?.contains(query, ignoreCase = true) == true) ||
+                    (it.personnelPrenom?.contains(query, ignoreCase = true) == true)
+        }
+
+        _diplomes.value = filtered.sortedByDescending { it.dateObtention }
     }
 }

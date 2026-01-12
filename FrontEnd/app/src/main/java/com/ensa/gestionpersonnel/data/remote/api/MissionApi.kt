@@ -59,7 +59,7 @@ interface MissionApi {
     /**
      * Clôture une mission (change son statut à TERMINEE)
      */
-    @PATCH("missions/{id}/cloturer")
+    @PUT("missions/{id}/close")
     suspend fun cloturerMission(
         @Path("id") id: Long
     ): Response<MissionDto>

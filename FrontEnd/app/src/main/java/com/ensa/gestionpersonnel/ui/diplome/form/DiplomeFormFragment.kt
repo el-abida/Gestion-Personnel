@@ -131,8 +131,10 @@ class DiplomeFormFragment : Fragment() {
                     val niveauPosition = NiveauDiplome.values().indexOf(it.niveau)
                     spinnerNiveau.setSelection(niveauPosition)
 
-                    selectedDate = it.dateObtention
-                    editTextDate.setText(dateFormat.format(selectedDate))
+                    it.dateObtention?.let { date ->
+                        selectedDate = date
+                        editTextDate.setText(dateFormat.format(selectedDate))
+                    }
 
                     selectedPersonnelId = it.personnelId
                     setupPersonnelSpinner() // Rafraîchir pour présélectionner

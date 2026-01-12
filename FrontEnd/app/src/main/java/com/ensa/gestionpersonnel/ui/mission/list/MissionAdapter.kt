@@ -44,7 +44,7 @@ class MissionAdapter(
         private val tvDateRetour: TextView = itemView.findViewById(R.id.tvDateRetour)
         private val tvDuree: TextView = itemView.findViewById(R.id.tvDuree)
         private val tvStatut: TextView = itemView.findViewById(R.id.tvStatut)
-        private val ivStatutIcon: ImageView = itemView.findViewById(R.id.ivStatutIcon)
+
 
         private val dateFormat = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
 
@@ -69,22 +69,18 @@ class MissionAdapter(
                 StatutMission.PLANIFIEE -> {
                     tvStatut.text = "PLANIFIÉE"
                     tvStatut.setBackgroundResource(R.drawable.bg_status_pending)
-                    ivStatutIcon.setImageResource(R.drawable.ic_calendar)
                 }
                 StatutMission.EN_COURS -> {
                     tvStatut.text = "EN COURS"
                     tvStatut.setBackgroundResource(R.drawable.bg_status_validated)
-                    ivStatutIcon.setImageResource(R.drawable.ic_flight)
                 }
                 StatutMission.TERMINEE -> {
                     tvStatut.text = "TERMINÉE"
                     tvStatut.setBackgroundResource(R.drawable.bg_status_validated)
-                    ivStatutIcon.setImageResource(R.drawable.ic_check)
                 }
                 StatutMission.ANNULEE -> {
                     tvStatut.text = "ANNULÉE"
                     tvStatut.setBackgroundResource(R.drawable.bg_status_pending)
-                    ivStatutIcon.setImageResource(R.drawable.ic_baseline_close_24)
                 }
             }
 

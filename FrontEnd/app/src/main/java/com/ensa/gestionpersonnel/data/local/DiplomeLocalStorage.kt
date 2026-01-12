@@ -87,8 +87,8 @@ class DiplomeLocalStorage @Inject constructor(
         val specialite: String,
         val niveau: String,
         val etablissement: String,
-        val dateObtention: String,
-        val fichierPreuve: String
+        val dateObtention: String?,
+        val fichierPreuve: String?
     ) {
         fun toDiplome(): Diplome {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -97,9 +97,9 @@ class DiplomeLocalStorage @Inject constructor(
                 personnelId = personnelId,
                 intitule = intitule,
                 specialite = specialite,
-                niveau = NiveauDiplome.valueOf(niveau),
+                niveau = try { NiveauDiplome.valueOf(niveau) } catch (e: Exception) { NiveauDiplome.Bac },
                 etablissement = etablissement,
-                dateObtention = dateFormat.parse(dateObtention) ?: Date(),
+                dateObtention = if (dateObtention != null) dateFormat.parse(dateObtention) else null,
                 fichierPreuve = fichierPreuve
             )
         }
@@ -113,7 +113,7 @@ class DiplomeLocalStorage @Inject constructor(
                     specialite = diplome.specialite,
                     niveau = diplome.niveau.name,
                     etablissement = diplome.etablissement,
-                    dateObtention = dateFormat.format(diplome.dateObtention),
+                    dateObtention = if (diplome.dateObtention != null) dateFormat.format(diplome.dateObtention) else null,
                     fichierPreuve = diplome.fichierPreuve
                 )
             }

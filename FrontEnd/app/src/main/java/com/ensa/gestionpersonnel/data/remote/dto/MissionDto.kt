@@ -79,7 +79,12 @@ data class MissionDto(
                 objetMission = mission.objetMission,
                 dateDepart = dateFormat.format(mission.dateDepart),
                 dateRetour = dateFormat.format(mission.dateRetour),
-                statut = mission.statut.name,
+                statut = when (mission.statut) {
+                    com.ensa.gestionpersonnel.domain.model.StatutMission.PLANIFIEE -> "Planifiée"
+                    com.ensa.gestionpersonnel.domain.model.StatutMission.EN_COURS -> "En_Cours"
+                    com.ensa.gestionpersonnel.domain.model.StatutMission.TERMINEE -> "Terminée"
+                    com.ensa.gestionpersonnel.domain.model.StatutMission.ANNULEE -> "Annulée"
+                },
                 rapportUrl = mission.rapportUrl,
                 personnelId = mission.personnelId,
                 personnelNom = mission.personnelNom,

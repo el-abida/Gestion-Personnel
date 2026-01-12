@@ -14,16 +14,42 @@ import java.util.List;
 @RequestMapping("/api/diplomes")
 @CrossOrigin(origins = "*")
 public class DiplomeController {
-    
+
     @Autowired
     private DiplomeService diplomeService;
-    
+
     @GetMapping("/personnel/{id}")
     public ResponseEntity<List<DiplomeDTO>> getDiplomesByPersonnelId(@PathVariable Long id) {
         List<DiplomeDTO> diplomes = diplomeService.getDiplomesByPersonnelId(id);
         return ResponseEntity.ok(diplomes);
     }
-    
+
+    @GetMapping
+    public ResponseEntity<List<DiplomeDTO>> getAllDiplomes() {
+        List<DiplomeDTO> diplomes = diplomeService.getAllDiplomes();
+        return ResponseEntity.ok(diplomes);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DiplomeDTO> getDiplomeById(@PathVariable Long id) {
+        try {
+            DiplomeDTO diplome = diplomeService.getDiplomeById(id);
+            return ResponseEntity.ok(diplome);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DiplomeDTO> updateDiplome(@PathVariable Long id, @Valid @RequestBody DiplomeDTO dto) {
+        try {
+            DiplomeDTO updated = diplomeService.updateDiplome(id, dto);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
     @PostMapping
     public ResponseEntity<DiplomeDTO> createDiplome(@Valid @RequestBody DiplomeDTO dto) {
         try {
@@ -33,7 +59,7 @@ public class DiplomeController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDiplome(@PathVariable Long id) {
         try {
@@ -44,4 +70,3 @@ public class DiplomeController {
         }
     }
 }
-

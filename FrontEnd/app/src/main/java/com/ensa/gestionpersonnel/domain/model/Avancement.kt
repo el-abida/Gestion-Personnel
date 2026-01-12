@@ -8,8 +8,9 @@ import java.util.Date
 data class Avancement(
     val id: Long = 0L,
     val dateDecision: Date,
-    val personnelId: Long,  // ← AJOUT
-
+    val personnelId: Long,
+    val personnelNom: String? = null,
+    val personnelPrenom: String? = null,
     val dateEffet: Date,
     val gradePrecedent: String,
     val gradeNouveau: String,

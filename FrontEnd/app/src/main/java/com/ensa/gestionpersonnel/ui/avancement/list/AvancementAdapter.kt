@@ -37,6 +37,14 @@ class AvancementAdapter(
         fun bind(avancement: Avancement) {
             binding.apply {
                 textSummary.text = avancement.getSummary()
+                
+                val personnelName = if (avancement.personnelNom != null && avancement.personnelPrenom != null) {
+                    "${avancement.personnelPrenom} ${avancement.personnelNom}"
+                } else {
+                    "Personnel #${avancement.personnelId}"
+                }
+                textPersonnel.text = personnelName
+                
                 textDateDecision.text = "Décision: ${dateFormat.format(avancement.dateDecision)}"
                 textDateEffet.text = "Effet: ${dateFormat.format(avancement.dateEffet)}"
 

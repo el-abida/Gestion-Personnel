@@ -6,10 +6,15 @@ import com.ensa.gestionpersonnel.data.local.DiplomeLocalStorage
 import com.ensa.gestionpersonnel.data.local.PreferencesManager
 import com.ensa.gestionpersonnel.data.remote.api.AuthApi
 import com.ensa.gestionpersonnel.data.remote.api.DashboardApi
+import com.ensa.gestionpersonnel.data.remote.api.DiplomeApi
 import com.ensa.gestionpersonnel.data.remote.api.PersonnelApi
 import com.ensa.gestionpersonnel.data.repository.AuthRepository
+import com.ensa.gestionpersonnel.data.repository.AvancementRepository
 import com.ensa.gestionpersonnel.data.repository.DashboardRepository
+import com.ensa.gestionpersonnel.data.repository.MissionRepository
 import com.ensa.gestionpersonnel.data.repository.PersonnelRepository
+import com.ensa.gestionpersonnel.data.remote.api.AvancementApi
+import com.ensa.gestionpersonnel.data.remote.api.MissionApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,6 +46,12 @@ object RepositoryModule {
 
     @Provides
     @Singleton
+    fun provideDiplomeRepository(diplomeApi: DiplomeApi): com.ensa.gestionpersonnel.data.repository.DiplomeRepository {
+        return com.ensa.gestionpersonnel.data.repository.DiplomeRepository(diplomeApi)
+    }
+
+    @Provides
+    @Singleton
     fun provideDiplomeLocalStorage(
         @ApplicationContext context: Context
     ): DiplomeLocalStorage {
@@ -53,5 +64,17 @@ object RepositoryModule {
         @ApplicationContext context: Context
     ): AvancementLocalStorage {
         return AvancementLocalStorage(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMissionRepository(missionApi: MissionApi): MissionRepository {
+        return MissionRepository(missionApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAvancementRepository(avancementApi: AvancementApi): AvancementRepository {
+        return AvancementRepository(avancementApi)
     }
 }

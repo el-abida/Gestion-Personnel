@@ -13,25 +13,27 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MissionDTO {
-    
+
     private Long id;
-    
+
     @NotBlank(message = "Destination is required")
     private String destination;
-    
+
     @NotBlank(message = "Mission object is required")
     private String objetMission;
-    
+
     @NotNull(message = "Departure date is required")
     private LocalDate dateDepart;
-    
+
     private LocalDate dateRetour;
-    
+
     private Mission.StatutMission statut = Mission.StatutMission.Planifiée;
-    
+
     private String rapportUrl;
-    
+
     @NotNull(message = "Personnel ID is required")
     private Long personnelId;
-}
 
+    private String personnelNom;
+    private String personnelPrenom;
+}

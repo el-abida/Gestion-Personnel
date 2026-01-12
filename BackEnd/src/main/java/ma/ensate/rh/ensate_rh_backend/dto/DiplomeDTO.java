@@ -13,23 +13,25 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DiplomeDTO {
-    
+
     private Long id;
-    
+
     @NotBlank(message = "Diploma title is required")
     private String intitule;
-    
+
     private String specialite;
-    
+
     private Diplome.Niveau niveau;
-    
+
     private String etablissement;
-    
+
     private LocalDate dateObtention;
-    
+
     private String fichierPreuve;
-    
+
     @NotNull(message = "Personnel ID is required")
     private Long personnelId;
-}
 
+    private String personnelNom;
+    private String personnelPrenom;
+}

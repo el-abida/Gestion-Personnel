@@ -43,8 +43,18 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/black"
                 tools:text="Technicien (E8-Ech3) → Ingénieur (E10-Ech1)"/>
+
+            <TextView
+                android:id="@+id/textPersonnel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="Ahmed Mansouri" />
 
             <!-- Date de décision -->
             <LinearLayout

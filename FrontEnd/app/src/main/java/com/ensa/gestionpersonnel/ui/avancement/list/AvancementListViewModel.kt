@@ -4,17 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ensa.gestionpersonnel.data.local.AvancementLocalStorage
+import com.ensa.gestionpersonnel.data.repository.AvancementRepository
 import com.ensa.gestionpersonnel.domain.model.Avancement
+import com.ensa.gestionpersonnel.utils.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class AvancementListViewModel @Inject constructor(
-    private val avancementStorage: AvancementLocalStorage
+    private val avancementRepository: AvancementRepository
 ) : ViewModel() {
 
     private val _avancements = MutableLiveData<List<Avancement>>()
@@ -23,39 +23,59 @@ class AvancementListViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
+    private val _error = MutableLiveData<String?>()
+    val error: LiveData<String?> = _error
+
+    private var allAvancementsCache = listOf<Avancement>()
+
     fun loadAvancements() {
         viewModelScope.launch {
-            _isLoading.value = true
-            val result = withContext(Dispatchers.IO) {
-                avancementStorage.getAllAvancements()
+            avancementRepository.getAllAvancements().collect { result ->
+                when (result) {
+                    is NetworkResult.Loading -> {
+                        _isLoading.value = true
+                        _error.value = null
+                    }
+                    is NetworkResult.Success<*> -> {
+                        _isLoading.value = false
+                        allAvancementsCache = (result.data as? List<Avancement>) ?: emptyList()
+                        _avancements.value = allAvancementsCache.sortedByDescending { it.dateEffet }
+                    }
+                    is NetworkResult.Error -> {
+                        _isLoading.value = false
+                        _error.value = result.message
+                    }
+                }
             }
-            _avancements.value = result.sortedByDescending { it.dateEffet }
-            _isLoading.value = false
         }
     }
 
     fun deleteAvancement(id: Long) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                avancementStorage.deleteAvancement(id)
+            avancementRepository.deleteAvancement(id).collect { result ->
+                if (result is NetworkResult.Success<*>) {
+                    loadAvancements()
+                } else if (result is NetworkResult.Error<*>) {
+                    _error.value = result.message
+                }
             }
-            loadAvancements()
         }
     }
 
     fun searchAvancements(query: String) {
-        viewModelScope.launch {
-            val allAvancements = withContext(Dispatchers.IO) {
-                avancementStorage.getAllAvancements()
-            }
-
-            val filtered = allAvancements.filter {
-                it.gradePrecedent.contains(query, ignoreCase = true) ||
-                        it.gradeNouveau.contains(query, ignoreCase = true) ||
-                        it.description.contains(query, ignoreCase = true)
-            }
-
-            _avancements.value = filtered.sortedByDescending { it.dateEffet }
+        if (query.isBlank()) {
+            _avancements.value = allAvancementsCache.sortedByDescending { it.dateEffet }
+            return
         }
+
+        val filtered = allAvancementsCache.filter {
+            it.gradePrecedent.contains(query, ignoreCase = true) ||
+                    it.gradeNouveau.contains(query, ignoreCase = true) ||
+                    it.description.contains(query, ignoreCase = true) ||
+                    (it.personnelNom?.contains(query, ignoreCase = true) ?: false) ||
+                    (it.personnelPrenom?.contains(query, ignoreCase = true) ?: false)
+        }
+
+        _avancements.value = filtered.sortedByDescending { it.dateEffet }
     }
 }

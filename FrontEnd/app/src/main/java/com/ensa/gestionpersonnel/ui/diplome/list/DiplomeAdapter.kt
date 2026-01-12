@@ -38,9 +38,17 @@ class DiplomeAdapter(
             binding.apply {
                 textIntitule.text = diplome.intitule
                 textSpecialite.text = diplome.specialite
+                
+                val personnelName = if (diplome.personnelNom != null && diplome.personnelPrenom != null) {
+                    "${diplome.personnelPrenom} ${diplome.personnelNom}"
+                } else {
+                    "Personnel #${diplome.personnelId}"
+                }
+                textPersonnel.text = personnelName
+
                 textNiveau.text = diplome.niveau.name.replace("_", "+")
                 textEtablissement.text = diplome.etablissement
-                textDateObtention.text = dateFormat.format(diplome.dateObtention)
+                textDateObtention.text = if (diplome.dateObtention != null) dateFormat.format(diplome.dateObtention) else "Date inconnue"
 
                 root.setOnClickListener { onItemClick(diplome) }
 

@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.ensa.gestionpersonnel.databinding.FragmentAvancementFormBinding
 import com.ensa.gestionpersonnel.domain.model.Personnel
+import com.ensa.gestionpersonnel.utils.NetworkResult
 import dagger.hilt.android.AndroidEntryPoint
 import java.text.SimpleDateFormat
 import java.util.*
@@ -44,7 +45,6 @@ class AvancementFormFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Si personnelId est passé en argument, on le présélectionne
         if (args.personnelId != 0L) {
             selectedPersonnelId = args.personnelId
         }
@@ -53,16 +53,18 @@ class AvancementFormFragment : Fragment() {
         setupObservers()
         setupListeners()
 
-        // ✅ CHARGER LA LISTE DES PERSONNELS
         viewModel.loadPersonnelList()
 
         if (args.avancementId != 0L) {
             viewModel.loadAvancement(args.avancementId)
+        } else {
+            binding.editTextDateDecision.setText(dateFormat.format(dateDecision))
+            binding.editTextDateEffet.setText(dateFormat.format(dateEffet))
         }
     }
 
     private fun setupPersonnelSpinner() {
-        val personnelNames = personnelList.map { "${it.getNomComplet()} (${it.ppr})" }
+        val personnelNames = personnelList.map { "${it.nomFr} ${it.prenomFr} (${it.ppr})" }
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -71,7 +73,6 @@ class AvancementFormFragment : Fragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerPersonnel.adapter = adapter
 
-        // Présélectionner le personnel si déjà défini
         if (selectedPersonnelId != 0L) {
             val position = personnelList.indexOfFirst { it.id == selectedPersonnelId }
             if (position >= 0) {
@@ -82,22 +83,23 @@ class AvancementFormFragment : Fragment() {
 
     private fun setupDatePickers() {
         binding.editTextDateDecision.setOnClickListener {
-            showDatePicker { date ->
+            showDatePicker(dateDecision) { date ->
                 dateDecision = date
                 binding.editTextDateDecision.setText(dateFormat.format(dateDecision))
             }
         }
 
         binding.editTextDateEffet.setOnClickListener {
-            showDatePicker { date ->
+            showDatePicker(dateEffet) { date ->
                 dateEffet = date
                 binding.editTextDateEffet.setText(dateFormat.format(dateEffet))
             }
         }
     }
 
-    private fun showDatePicker(onDateSelected: (Date) -> Unit) {
+    private fun showDatePicker(initialDate: Date, onDateSelected: (Date) -> Unit) {
         val calendar = Calendar.getInstance()
+        calendar.time = initialDate
 
         DatePickerDialog(
             requireContext(),
@@ -112,7 +114,6 @@ class AvancementFormFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        // ✅ OBSERVER POUR LA LISTE DES PERSONNELS
         viewModel.personnelList.observe(viewLifecycleOwner) { list ->
             personnelList = list
             setupPersonnelSpinner()
@@ -135,15 +136,24 @@ class AvancementFormFragment : Fragment() {
                     editTextDateEffet.setText(dateFormat.format(dateEffet))
 
                     selectedPersonnelId = it.personnelId
-                    setupPersonnelSpinner() // Rafraîchir pour présélectionner
+                    setupPersonnelSpinner()
                 }
             }
         }
 
-        viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
-            if (success) {
-                Toast.makeText(requireContext(), "Avancement enregistré", Toast.LENGTH_SHORT).show()
-                findNavController().navigateUp()
+        viewModel.saveState.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is NetworkResult.Loading -> {
+                    binding.buttonSave.isEnabled = false
+                }
+                is NetworkResult.Success -> {
+                    Toast.makeText(requireContext(), "Avancement enregistré", Toast.LENGTH_SHORT).show()
+                    findNavController().navigateUp()
+                }
+                is NetworkResult.Error -> {
+                    binding.buttonSave.isEnabled = true
+                    Toast.makeText(requireContext(), result.message, Toast.LENGTH_LONG).show()
+                }
             }
         }
 
@@ -162,6 +172,10 @@ class AvancementFormFragment : Fragment() {
         binding.buttonCancel.setOnClickListener {
             findNavController().navigateUp()
         }
+
+        binding.btnBack.setOnClickListener {
+            findNavController().navigateUp()
+        }
     }
 
     private fun saveAvancement() {
@@ -173,7 +187,6 @@ class AvancementFormFragment : Fragment() {
         val echelonNouveau = binding.editTextEchelonNouveau.text.toString().toIntOrNull() ?: 0
         val description = binding.editTextDescription.text.toString()
 
-        // ✅ RÉCUPÉRER LE PERSONNEL SÉLECTIONNÉ
         val personnelPosition = binding.spinnerPersonnel.selectedItemPosition
         if (personnelPosition < 0 || personnelPosition >= personnelList.size) {
             Toast.makeText(requireContext(), "Veuillez sélectionner un personnel", Toast.LENGTH_SHORT).show()

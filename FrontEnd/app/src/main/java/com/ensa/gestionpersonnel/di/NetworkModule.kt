@@ -6,7 +6,9 @@ import com.ensa.gestionpersonnel.data.remote.AuthInterceptor
 import com.ensa.gestionpersonnel.data.remote.api.AbsenceApi
 import com.ensa.gestionpersonnel.data.remote.api.AuthApi
 import com.ensa.gestionpersonnel.data.remote.api.DashboardApi
-import com.ensa.gestionpersonnel.data.remote.api.MissionApi  // ← AJOUTEZ CET IMPORT
+import com.ensa.gestionpersonnel.data.remote.api.DiplomeApi
+import com.ensa.gestionpersonnel.data.remote.api.AvancementApi
+import com.ensa.gestionpersonnel.data.remote.api.MissionApi
 import com.ensa.gestionpersonnel.data.remote.api.PersonnelApi
 import com.ensa.gestionpersonnel.utils.Constants
 import dagger.Module
@@ -86,7 +88,19 @@ object NetworkModule {
     // ← AJOUTEZ CETTE MÉTHODE
     @Provides
     @Singleton
+    fun provideDiplomeApi(retrofit: Retrofit): DiplomeApi {
+        return retrofit.create(DiplomeApi::class.java)
+    }
+
+    @Provides
+    @Singleton
     fun provideMissionApi(retrofit: Retrofit): MissionApi {
         return retrofit.create(MissionApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAvancementApi(retrofit: Retrofit): AvancementApi {
+        return retrofit.create(AvancementApi::class.java)
     }
 }

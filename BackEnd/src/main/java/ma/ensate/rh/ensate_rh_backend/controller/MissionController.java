@@ -14,10 +14,10 @@ import java.util.List;
 @RequestMapping("/api/missions")
 @CrossOrigin(origins = "*")
 public class MissionController {
-    
+
     @Autowired
     private MissionService missionService;
-    
+
     @PostMapping
     public ResponseEntity<MissionDTO> createMission(@Valid @RequestBody MissionDTO dto) {
         try {
@@ -27,13 +27,49 @@ public class MissionController {
             return ResponseEntity.badRequest().build();
         }
     }
-    
+
+    @GetMapping
+    public ResponseEntity<List<MissionDTO>> getAllMissions() {
+        List<MissionDTO> missions = missionService.getAllMissions();
+        return ResponseEntity.ok(missions);
+    }
+
     @GetMapping("/personnel/{id}")
     public ResponseEntity<List<MissionDTO>> getMissionsByPersonnelId(@PathVariable Long id) {
         List<MissionDTO> missions = missionService.getMissionsByPersonnelId(id);
         return ResponseEntity.ok(missions);
     }
-    
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MissionDTO> getMissionById(@PathVariable Long id) {
+        try {
+            MissionDTO mission = missionService.getMissionById(id);
+            return ResponseEntity.ok(mission);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MissionDTO> updateMission(@PathVariable Long id, @Valid @RequestBody MissionDTO dto) {
+        try {
+            MissionDTO updated = missionService.updateMission(id, dto);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMission(@PathVariable Long id) {
+        try {
+            missionService.deleteMission(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PutMapping("/{id}/close")
     public ResponseEntity<MissionDTO> closeMission(@PathVariable Long id) {
         try {
@@ -44,4 +80,3 @@ public class MissionController {
         }
     }
 }
-

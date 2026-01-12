@@ -4,21 +4,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ensa.gestionpersonnel.data.local.DiplomeLocalStorage
-import com.ensa.gestionpersonnel.data.local.PersonnelLocalStorage
+import com.ensa.gestionpersonnel.data.repository.DiplomeRepository
+import com.ensa.gestionpersonnel.data.repository.PersonnelRepository
 import com.ensa.gestionpersonnel.domain.model.Diplome
 import com.ensa.gestionpersonnel.domain.model.NiveauDiplome
 import com.ensa.gestionpersonnel.domain.model.Personnel
+import com.ensa.gestionpersonnel.utils.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class DiplomeFormViewModel @Inject constructor(
-    private val diplomeStorage: DiplomeLocalStorage
+    private val diplomeRepository: DiplomeRepository,
+    private val personnelRepository: PersonnelRepository
 ) : ViewModel() {
 
     private val _diplome = MutableLiveData<Diplome?>()
@@ -35,19 +36,25 @@ class DiplomeFormViewModel @Inject constructor(
 
     fun loadPersonnelList() {
         viewModelScope.launch {
-            val list = withContext(Dispatchers.IO) {
-                PersonnelLocalStorage.getAllPersonnel()
+            val result = personnelRepository.getAllPersonnel()
+            if (result is NetworkResult.Success<*>) {
+                val data = result.data as? List<Personnel>
+                _personnelList.value = data?.filter { it.estActif } ?: emptyList()
+            } else if (result is NetworkResult.Error<*>) {
+                _error.value = result.message
             }
-            _personnelList.value = list.filter { it.estActif }
         }
     }
 
     fun loadDiplome(id: Long) {
         viewModelScope.launch {
-            val result = withContext(Dispatchers.IO) {
-                diplomeStorage.getDiplomeById(id)
+            diplomeRepository.getDiplomeById(id).collect { result ->
+                if (result is NetworkResult.Success<*>) {
+                    _diplome.value = result.data as? Diplome
+                } else if (result is NetworkResult.Error<*>) {
+                    _error.value = result.message
+                }
             }
-            _diplome.value = result
         }
     }
 
@@ -58,8 +65,8 @@ class DiplomeFormViewModel @Inject constructor(
         specialite: String,
         niveau: NiveauDiplome,
         etablissement: String,
-        dateObtention: Date,
-        fichierPreuve: String
+        dateObtention: Date?,
+        fichierPreuve: String?
     ) {
         viewModelScope.launch {
             if (intitule.isBlank()) {
@@ -98,11 +105,19 @@ class DiplomeFormViewModel @Inject constructor(
                 return@launch
             }
 
-            withContext(Dispatchers.IO) {
-                diplomeStorage.saveDiplome(diplome)
+            val flow = if (id == 0L) {
+                diplomeRepository.createDiplome(diplome)
+            } else {
+                diplomeRepository.updateDiplome(diplome)
             }
 
-            _saveSuccess.value = true
+            flow.collect { result ->
+                when (result) {
+                    is NetworkResult.Success<*> -> _saveSuccess.value = true
+                    is NetworkResult.Error<*> -> _error.value = result.message
+                    is NetworkResult.Loading<*> -> { /* Show loading if needed */ }
+                }
+            }
         }
     }
 }
