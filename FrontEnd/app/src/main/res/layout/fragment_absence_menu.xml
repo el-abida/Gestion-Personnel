@@ -47,7 +47,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@android:drawable/ic_menu_agenda"
+                        android:src="@drawable/ic_calendar"
                         android:tint="?attr/colorPrimary"
                         android:layout_marginEnd="16dp" />
 
@@ -73,11 +73,7 @@
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_media_next"
-                        android:tint="@android:color/darker_gray" />
+
 
                 </LinearLayout>
 
@@ -101,7 +97,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@android:drawable/ic_menu_today"
+                        android:src="@drawable/ic_calendar_absent"
                         android:tint="?attr/colorPrimary"
                         android:layout_marginEnd="16dp" />
 
@@ -127,11 +123,7 @@
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_media_next"
-                        android:tint="@android:color/darker_gray" />
+
 
                 </LinearLayout>
 
@@ -155,7 +147,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@android:drawable/ic_dialog_alert"
+                        android:src="@drawable/ic_note"
                         android:tint="@android:color/holo_red_dark"
                         android:layout_marginEnd="16dp" />
 
@@ -181,11 +173,7 @@
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_media_next"
-                        android:tint="@android:color/darker_gray" />
+
 
                 </LinearLayout>
 
@@ -208,7 +196,7 @@
                     <ImageView
                         android:layout_width="48dp"
                         android:layout_height="48dp"
-                        android:src="@android:drawable/ic_menu_info_details"
+                        android:src="@drawable/ic_calendar"
                         android:tint="?attr/colorPrimary"
                         android:layout_marginEnd="16dp" />
 
@@ -234,11 +222,7 @@
 
                     </LinearLayout>
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@android:drawable/ic_media_next"
-                        android:tint="@android:color/darker_gray" />
+
 
                 </LinearLayout>
 
