@@ -112,10 +112,7 @@ class MainActivity : AppCompatActivity() {
                 navController.navigate(R.id.profileRHFragment)
                 true
             }
-            R.id.action_notifications -> {
-                Toast.makeText(this, "Notifications - À implémenter", Toast.LENGTH_SHORT).show()
-                true
-            }
+
             R.id.action_logout -> {
                 showLogoutConfirmation()
                 true

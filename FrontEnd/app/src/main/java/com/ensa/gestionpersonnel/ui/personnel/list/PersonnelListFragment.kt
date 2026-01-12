@@ -137,10 +137,13 @@ class PersonnelListFragment : Fragment() {
                 }
                 is NetworkResult.Success -> {
                     Toast.makeText(context, "Personnel supprimé", Toast.LENGTH_SHORT).show()
+                    viewModel.resetDeleteState()
                 }
                 is NetworkResult.Error -> {
                     Toast.makeText(context, result.message, Toast.LENGTH_SHORT).show()
+                    viewModel.resetDeleteState()
                 }
+                null -> { /* Ne rien faire */ }
             }
         }
     }

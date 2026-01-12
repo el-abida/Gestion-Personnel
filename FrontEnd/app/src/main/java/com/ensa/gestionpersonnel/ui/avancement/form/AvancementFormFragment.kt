@@ -194,6 +194,12 @@ class AvancementFormFragment : Fragment() {
         }
         val personnelId = personnelList[personnelPosition].id
 
+        // Validation des dates
+        if (dateEffet.before(dateDecision)) {
+            Toast.makeText(requireContext(), "La date d'effet doit être après ou égale à la date de décision", Toast.LENGTH_LONG).show()
+            return
+        }
+
         viewModel.saveAvancement(
             id = args.avancementId,
             personnelId = personnelId,

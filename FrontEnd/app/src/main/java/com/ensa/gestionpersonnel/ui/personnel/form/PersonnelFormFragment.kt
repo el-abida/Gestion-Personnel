@@ -57,21 +57,13 @@ class PersonnelFormFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        setupUI()
         setupDropdowns()
         setupDatePickers()
         setupClickListeners()
         setupObservers()
     }
 
-    private fun setupUI() {
-        // Titre dynamique
-        binding.tvTitle.text = if (viewModel.isEditMode) {
-            "Modifier le Personnel"
-        } else {
-            "Ajouter un Personnel"
-        }
-    }
+
 
     private fun setupDropdowns() {
         // Sexe
@@ -142,10 +134,7 @@ class PersonnelFormFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Bouton retour
-        binding.btnBack.setOnClickListener {
-            findNavController().navigateUp()
-        }
+        // Bouton retour supprimé (géré par la toolbar)
 
         // Sélection de photo
         binding.btnSelectPhoto.setOnClickListener {

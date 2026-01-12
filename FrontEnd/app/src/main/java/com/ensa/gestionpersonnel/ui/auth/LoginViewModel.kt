@@ -20,7 +20,7 @@ class LoginViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Mode test : mettre à true pour activer le mode test (contourne le backend)
-    private val TEST_MODE = true
+    private val TEST_MODE = false
 
     private val _loginState = MutableLiveData<NetworkResult<LoginResponse>>()
     val loginState: LiveData<NetworkResult<LoginResponse>> = _loginState
@@ -46,11 +46,12 @@ class LoginViewModel @Inject constructor(
                 
                 // Crée une réponse de test
                 val testResponse = LoginResponse(
-                    token = fakeToken,
-                    userId = 1L,
+                    id = 1L,
                     nom = "Test",
                     prenom = "User",
-                    email = "$username@ensa.ac.ma"
+                    email = "$username@ensa.ac.ma",
+                    username = username,
+                    token = fakeToken
                 )
                 
                 _loginState.value = NetworkResult.Success(testResponse)

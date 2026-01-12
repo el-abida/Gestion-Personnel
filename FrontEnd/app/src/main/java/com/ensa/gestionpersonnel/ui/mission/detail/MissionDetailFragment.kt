@@ -66,31 +66,10 @@ class MissionDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupToolbar()
         setupButtons()
         observeViewModel()
 
         viewModel.loadMissionDetail(args.missionId)
-    }
-
-    private fun setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        binding.toolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.action_edit -> {
-                    navigateToEdit()
-                    true
-                }
-                R.id.action_delete -> {
-                    showDeleteConfirmation()
-                    true
-                }
-                else -> false
-            }
-        }
     }
 
     private fun setupButtons() {
@@ -106,6 +85,14 @@ class MissionDetailFragment : Fragment() {
             currentMission?.rapportUrl?.let { url ->
                 openRapport(url)
             }
+        }
+
+        binding.btnEdit.setOnClickListener {
+            navigateToEdit()
+        }
+
+        binding.btnDelete.setOnClickListener {
+            showDeleteConfirmation()
         }
     }
 

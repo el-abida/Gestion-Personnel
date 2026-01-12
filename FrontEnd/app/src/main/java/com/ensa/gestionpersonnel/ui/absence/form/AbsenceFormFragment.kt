@@ -78,22 +78,7 @@ class AbsenceFormFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Configuration du titre
-        binding.toolbar.title = if (absenceId != 0L) {
-            "Modifier l'absence"
-        } else {
-            when (selectedAbsenceType) {
-                AbsenceType.CONGE_ANNUEL -> "Nouveau Congé"
-                AbsenceType.MALADIE -> "Nouvelle Absence Maladie"
-                AbsenceType.EXCEPTIONNELLE -> "Nouvelle Absence Exceptionnelle"
-                AbsenceType.NON_JUSTIFIEE -> "Nouvelle Absence Non Justifiée"
-                null -> "Nouvelle Absence"
-            }
-        }
 
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
 
         // Configuration du spinner de type
         val types = AbsenceType.values().map { type ->

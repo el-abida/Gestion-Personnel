@@ -59,6 +59,10 @@ class PersonnelListViewModel @Inject constructor(
         }
     }
 
+    fun resetDeleteState() {
+        _deleteState.value = null
+    }
+
     fun loadPersonnelById(personnelId: Long) {
         _personnelListState.value = NetworkResult.Loading()
         viewModelScope.launch {

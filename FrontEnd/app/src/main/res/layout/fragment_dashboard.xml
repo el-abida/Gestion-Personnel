@@ -11,253 +11,284 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Titre -->
+
+
+        <!-- Statistiques Clés -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tableau de Bord"
-            android:textSize="24sp"
+            android:text="Statistiques Clés"
+            android:textSize="22sp"
             android:textStyle="bold"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/colorPrimaryDark"/>
 
-        <!-- Card Total Personnel -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Grid de KPI -->
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="8dp">
+            android:columnCount="2"
+            android:layout_marginBottom="12dp">
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Total Personnel -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:src="@drawable/ic_people"
-                    app:tint="@color/colorPrimary"/>
-
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="12dp">
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:layout_marginStart="16dp">
-
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Effectif Total"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorTextSecondary"/>
                     <TextView
                         android:id="@+id/tvTotalPersonnel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
-                        android:textSize="32sp"
+                        android:textSize="24sp"
                         android:textStyle="bold"
                         android:textColor="@color/colorPrimary"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Total Personnel"
-                        android:textSize="14sp"/>
-                </LinearLayout>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- Cards Actifs/Inactifs -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/tvPersonnelActif"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/green"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Actifs"
-                        android:textSize="12sp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Absences en cours -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
-
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="12dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="16dp"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/tvPersonnelInactif"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/red"/>
-
+                    android:padding="16dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Inactifs"
-                        android:textSize="12sp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
-
-        <!-- KPI supplémentaires -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
-
-            <!-- Moyenne Ancienneté -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="6dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:gravity="center">
-
+                        android:text="Absences à Valider"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorTextSecondary"/>
                     <TextView
-                        android:id="@+id/tvMoyenneAnciennete"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/blue"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Ancienneté moy. (ans)"
-                        android:textSize="12sp"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Total Congés -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="6dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:gravity="center">
-
-                    <TextView
-                        android:id="@+id/tvTotalConges"
+                        android:id="@+id/tvAbsencesEnCours"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="0"
                         android:textSize="24sp"
                         android:textStyle="bold"
                         android:textColor="@color/orange"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
+            <!-- Missions en cours -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="12dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Congés (jours)"
-                        android:textSize="12sp"/>
+                        android:text="Missions Actives"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorTextSecondary"/>
+                    <TextView
+                        android:id="@+id/tvMissionsEnCours"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/blue"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Avancements Année -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="12dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Promotions Année"
+                        android:textSize="12sp"
+                        android:textColor="@color/colorTextSecondary"/>
+                    <TextView
+                        android:id="@+id/tvAvancementsAnnee"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/green"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </GridLayout>
+
+        <!-- Autres KPI -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center">
+                    <TextView
+                        android:id="@+id/tvMoyenneAnciennete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ancienneté Moy."
+                        android:textSize="10sp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center">
+                    <TextView
+                        android:id="@+id/tvTotalConges"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/orange"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Solde Congés"
+                        android:textSize="10sp"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="4dp"
+                app:cardElevation="2dp"
+                app:cardCornerRadius="8dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:gravity="center">
+                    <TextView
+                        android:id="@+id/tvPersonnelActif"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/green"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Personnel Actif"
+                        android:textSize="10sp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-        <!-- Chart répartition par type -->
+        <!-- Chart -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="250dp"
             android:layout_marginBottom="12dp"
-            app:cardElevation="4dp"
-            app:cardCornerRadius="8dp">
-
+            app:cardElevation="2dp"
+            app:cardCornerRadius="12dp">
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:padding="16dp">
-
+                android:padding="12dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Répartition par Type"
-                    android:textSize="16sp"
+                    android:text="Répartition par Catégorie"
+                    android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="8dp"/>
-
                 <com.github.mikephil.charting.charts.PieChart
                     android:id="@+id/pieChart"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
+                    android:layout_height="match_parent"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ProgressBar -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:visibility="gone"
-            android:layout_marginTop="16dp"/>
+            android:layout_margin="16dp"/>
 
-        <!-- Bouton Actualiser -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRefresh"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Actualiser"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_marginTop="8dp"/>
+            android:text="Actualiser les données"
+            style="@style/Widget.Material3.Button.TextButton"
+            app:icon="@drawable/ic_search"
+            android:layout_marginBottom="32dp"/>
 
     </LinearLayout>
 </ScrollView>

@@ -117,10 +117,19 @@ class CongeFormFragment : Fragment() {
 
     private fun submitConge() {
         val personnelId = arguments?.getLong("personnelId") ?: 1L
-        val dateDebut = selectedDateDebut ?: return
-        val dateFin = selectedDateFin ?: return
-        val motif = binding.etMotif.text.toString().trim()
+        
+        if (selectedDateDebut == null || selectedDateFin == null) {
+            Snackbar.make(binding.root, "Veuillez sélectionner les dates de début et de fin", Snackbar.LENGTH_LONG).show()
+            return
+        }
 
+        if (selectedDateFin!!.before(selectedDateDebut)) {
+            binding.etDateFin.error = "La date de fin doit être après la date de début"
+            Snackbar.make(binding.root, "La date de fin doit être après la date de début", Snackbar.LENGTH_LONG).show()
+            return
+        }
+
+        val motif = binding.etMotif.text.toString().trim()
         if (motif.isEmpty()) {
             binding.etMotif.error = "Veuillez saisir un motif"
             return
@@ -131,8 +140,8 @@ class CongeFormFragment : Fragment() {
             personnelNom = "Nom",
             personnelPrenom = "Prénom",
             personnelPpr = "PPR",
-            dateDebut = dateDebut,
-            dateFin = dateFin,
+            dateDebut = selectedDateDebut!!,
+            dateFin = selectedDateFin!!,
             type = AbsenceType.CONGE_ANNUEL,
             motif = motif,
             estValideeParAdmin = false

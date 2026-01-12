@@ -11,32 +11,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header avec bouton retour -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnBack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="← Retour"
-                style="@style/Widget.Material3.Button.TextButton"
-                android:textColor="?attr/colorPrimary"/>
-
-            <TextView
-                android:id="@+id/tvTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Ajouter un Personnel"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:gravity="center"/>
-        </LinearLayout>
 
         <!-- Section Photo -->
         <com.google.android.material.card.MaterialCardView

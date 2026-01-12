@@ -58,7 +58,6 @@ class MissionFormFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupToolbar()
         setupStatutDropdown()
         setupDatePickers()
         setupButtons()
@@ -68,14 +67,7 @@ class MissionFormFragment : Fragment() {
         personnelViewModel.loadPersonnelList()
 
         if (args.missionId != -1L) {
-            binding.toolbar.title = "Modifier Mission"
             missionViewModel.loadMissionDetail(args.missionId)
-        }
-    }
-
-    private fun setupToolbar() {
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
         }
     }
 

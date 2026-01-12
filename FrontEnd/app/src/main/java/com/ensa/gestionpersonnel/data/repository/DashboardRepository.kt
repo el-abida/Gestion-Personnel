@@ -13,7 +13,7 @@ class DashboardRepository @Inject constructor(
 ) {
     
     // Mode test : mettre à false pour utiliser le vrai backend
-    private val TEST_MODE = true
+    private val TEST_MODE = false
     
     suspend fun getStats(): NetworkResult<DashboardStats> {
         if (TEST_MODE) {

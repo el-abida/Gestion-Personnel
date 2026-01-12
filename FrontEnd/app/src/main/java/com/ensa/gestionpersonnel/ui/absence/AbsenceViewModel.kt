@@ -32,6 +32,9 @@ class AbsenceViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>(false)
     val isLoading: LiveData<Boolean> = _isLoading
 
+    private val _currentSearchQuery = MutableLiveData<String>("")
+    private val _currentValidatedFilter = MutableLiveData<Boolean?>(null)
+
     init {
         loadAllAbsences()
     }
@@ -42,18 +45,11 @@ class AbsenceViewModel @Inject constructor(
             try {
                 absenceRepository.getAllAbsences().collect { result ->
                     _absences.value = result
-                    when (result) {
-                        is NetworkResult.Success<*> -> {
-                            _filteredAbsences.value = (result.data as? List<Absence>) ?: emptyList()
-                            _isLoading.value = false
-                        }
-                        is NetworkResult.Error<*> -> {
-                            _filteredAbsences.value = emptyList()
-                            _isLoading.value = false
-                        }
-                        is NetworkResult.Loading<*> -> {
-                            _isLoading.value = true
-                        }
+                    if (result is NetworkResult.Success) {
+                        applyFilters()
+                    }
+                    if (result !is NetworkResult.Loading) {
+                        _isLoading.value = false
                     }
                 }
             } catch (e: Exception) {
@@ -70,18 +66,11 @@ class AbsenceViewModel @Inject constructor(
             try {
                 absenceRepository.getAbsencesByPersonnel(personnelId).collect { result ->
                     _absences.value = result
-                    when (result) {
-                        is NetworkResult.Success<*> -> {
-                            _filteredAbsences.value = (result.data as? List<Absence>) ?: emptyList()
-                            _isLoading.value = false
-                        }
-                        is NetworkResult.Error<*> -> {
-                            _filteredAbsences.value = emptyList()
-                            _isLoading.value = false
-                        }
-                        is NetworkResult.Loading<*> -> {
-                            _isLoading.value = true
-                        }
+                    if (result is NetworkResult.Success) {
+                        applyFilters()
+                    }
+                    if (result !is NetworkResult.Loading) {
+                        _isLoading.value = false
                     }
                 }
             } catch (e: Exception) {
@@ -107,7 +96,7 @@ class AbsenceViewModel @Inject constructor(
                             val newList = (currentAbsences.data as? List<Absence>)?.toMutableList() ?: mutableListOf()
                             newList.add(data)
                             _absences.value = NetworkResult.Success(newList)
-                            _filteredAbsences.value = newList
+                            applyFilters()
                         } else {
                             loadAllAbsences()
                         }
@@ -136,7 +125,7 @@ class AbsenceViewModel @Inject constructor(
                                 if (existingAbsence.id == absence.id) data else existingAbsence
                             } ?: emptyList()
                             _absences.value = NetworkResult.Success(updatedList)
-                            _filteredAbsences.value = updatedList
+                            applyFilters()
                         }
                     }
                 }
@@ -163,7 +152,7 @@ class AbsenceViewModel @Inject constructor(
                                 if (existingAbsence.id == absenceId) data else existingAbsence
                             } ?: emptyList()
                             _absences.value = NetworkResult.Success(updatedList)
-                            _filteredAbsences.value = updatedList
+                            applyFilters()
                         }
                     }
                 }
@@ -192,7 +181,7 @@ class AbsenceViewModel @Inject constructor(
                         if (currentAbsences is NetworkResult.Success<*>) {
                             val filteredList = (currentAbsences.data as? List<Absence>)?.filter { it.id != absenceId } ?: emptyList()
                             _absences.value = NetworkResult.Success(filteredList)
-                            _filteredAbsences.value = filteredList
+                            applyFilters()
                         }
                     }
                 }
@@ -205,39 +194,38 @@ class AbsenceViewModel @Inject constructor(
 
     fun filterAbsencesByType(type: String?) {
         _currentFilterType.value = type
-        applyFilters(type = type)
+        applyFilters()
     }
 
     fun filterAbsencesByStatus(validated: Boolean?) {
-        applyFilters(validated = validated)
+        _currentValidatedFilter.value = validated
+        applyFilters()
     }
 
     fun searchAbsences(query: String) {
-        applyFilters(searchQuery = query)
+        _currentSearchQuery.value = query
+        applyFilters()
     }
 
     fun clearFilters() {
         _currentFilterType.value = null
-        val currentAbsences = _absences.value
-        if (currentAbsences is NetworkResult.Success<*>) {
-            _filteredAbsences.value = (currentAbsences.data as? List<Absence>) ?: emptyList()
-        } else {
-            _filteredAbsences.value = emptyList()
-        }
+        _currentSearchQuery.value = ""
+        _currentValidatedFilter.value = null
+        applyFilters()
     }
 
-    private fun applyFilters(
-        type: String? = _currentFilterType.value,
-        validated: Boolean? = null,
-        searchQuery: String? = null
-    ) {
+    private fun applyFilters() {
         val currentAbsences = _absences.value
         if (currentAbsences is NetworkResult.Success<*>) {
             val data = (currentAbsences.data as? List<Absence>) ?: emptyList()
             var filtered = data
 
+            val type = _currentFilterType.value
+            val validated = _currentValidatedFilter.value
+            val searchQuery = _currentSearchQuery.value
+
             // Appliquer le filtre par type
-            if (type != null) {
+            if (!type.isNullOrEmpty()) {
                 filtered = filtered.filter { it.type.name == type }
             }
 
@@ -249,10 +237,15 @@ class AbsenceViewModel @Inject constructor(
             // Appliquer la recherche
             if (!searchQuery.isNullOrBlank()) {
                 filtered = filtered.filter { absence ->
-                    absence.personnelNom?.contains(searchQuery, ignoreCase = true) == true ||
-                            absence.personnelPrenom?.contains(searchQuery, ignoreCase = true) == true ||
-                            absence.personnelPpr?.contains(searchQuery, ignoreCase = true) == true ||
-                            absence.motif?.contains(searchQuery, ignoreCase = true) == true
+                    val nom = absence.personnelNom ?: ""
+                    val prenom = absence.personnelPrenom ?: ""
+                    val ppr = absence.personnelPpr ?: ""
+                    val motif = absence.motif ?: ""
+                    
+                    nom.contains(searchQuery, ignoreCase = true) ||
+                    prenom.contains(searchQuery, ignoreCase = true) ||
+                    ppr.contains(searchQuery, ignoreCase = true) ||
+                    motif.contains(searchQuery, ignoreCase = true)
                 }
             }
 

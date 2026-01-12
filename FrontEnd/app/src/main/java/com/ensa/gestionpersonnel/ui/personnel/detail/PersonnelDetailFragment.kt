@@ -79,10 +79,7 @@ class PersonnelDetailFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Bouton retour
-        binding.btnBack.setOnClickListener {
-            findNavController().navigateUp()
-        }
+        // Bouton retour supprimé (géré par la toolbar)
 
         binding.btnEdit.setOnClickListener {
             // Navigation vers formulaire d'édition

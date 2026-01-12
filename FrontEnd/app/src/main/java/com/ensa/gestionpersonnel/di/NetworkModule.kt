@@ -10,6 +10,7 @@ import com.ensa.gestionpersonnel.data.remote.api.DiplomeApi
 import com.ensa.gestionpersonnel.data.remote.api.AvancementApi
 import com.ensa.gestionpersonnel.data.remote.api.MissionApi
 import com.ensa.gestionpersonnel.data.remote.api.PersonnelApi
+import com.ensa.gestionpersonnel.data.remote.api.ProfileApi
 import com.ensa.gestionpersonnel.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -96,6 +97,12 @@ object NetworkModule {
     @Singleton
     fun provideMissionApi(retrofit: Retrofit): MissionApi {
         return retrofit.create(MissionApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideProfileApi(retrofit: Retrofit): ProfileApi {
+        return retrofit.create(ProfileApi::class.java)
     }
 
     @Provides

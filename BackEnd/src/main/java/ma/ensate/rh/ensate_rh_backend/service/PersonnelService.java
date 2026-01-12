@@ -16,37 +16,37 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class PersonnelService {
-    
+
     @Autowired
     private PersonnelRepository personnelRepository;
-    
+
     @Autowired
     private CitoyenRepository citoyenRepository;
-    
+
     public List<PersonnelDTO> getAllPersonnel() {
         return personnelRepository.findAll().stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     public PersonnelDTO getPersonnelById(Long id) {
         Personnel personnel = personnelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Personnel not found with id: " + id));
         return convertToDTO(personnel);
     }
-    
+
     public PersonnelDTO createPersonnel(PersonnelDTO dto) {
         if (personnelRepository.existsByPpr(dto.getPpr())) {
             throw new RuntimeException("PPR already exists: " + dto.getPpr());
         }
-        
+
         if (personnelRepository.existsByCitoyen_Cin(dto.getCitoyen().getCin())) {
             throw new RuntimeException("CIN already exists: " + dto.getCitoyen().getCin());
         }
-        
+
         Citoyen citoyen = convertToCitoyen(dto.getCitoyen());
         citoyen = citoyenRepository.save(citoyen);
-        
+
         Personnel personnel = new Personnel();
         personnel.setCitoyen(citoyen);
         personnel.setPpr(dto.getPpr());
@@ -58,15 +58,15 @@ public class PersonnelService {
         personnel.setEchelonActuel(dto.getEchelonActuel());
         personnel.setSoldeConges(dto.getSoldeConges() != null ? dto.getSoldeConges() : 0);
         personnel.setEstActif(dto.getEstActif() != null ? dto.getEstActif() : true);
-        
+
         personnel = personnelRepository.save(personnel);
         return convertToDTO(personnel);
     }
-    
+
     public PersonnelDTO updatePersonnel(Long id, PersonnelDTO dto) {
         Personnel personnel = personnelRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Personnel not found with id: " + id));
-        
+
         // Update citoyen
         Citoyen citoyen = personnel.getCitoyen();
         CitoyenDTO citoyenDTO = dto.getCitoyen();
@@ -82,7 +82,7 @@ public class PersonnelService {
         citoyen.setSexe(citoyenDTO.getSexe());
         citoyen.setPhotoUrl(citoyenDTO.getPhotoUrl());
         citoyenRepository.save(citoyen);
-        
+
         // Update personnel
         if (dto.getPpr() != null && !dto.getPpr().equals(personnel.getPpr())) {
             if (personnelRepository.existsByPpr(dto.getPpr())) {
@@ -102,18 +102,24 @@ public class PersonnelService {
         if (dto.getEstActif() != null) {
             personnel.setEstActif(dto.getEstActif());
         }
-        
+
         personnel = personnelRepository.save(personnel);
         return convertToDTO(personnel);
     }
-    
+
     public void deletePersonnel(Long id) {
         if (!personnelRepository.existsById(id)) {
             throw new RuntimeException("Personnel not found with id: " + id);
         }
         personnelRepository.deleteById(id);
     }
-    
+
+    public List<PersonnelDTO> searchPersonnel(String query) {
+        return personnelRepository.search(query).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     private PersonnelDTO convertToDTO(Personnel personnel) {
         PersonnelDTO dto = new PersonnelDTO();
         dto.setId(personnel.getId());
@@ -129,7 +135,7 @@ public class PersonnelService {
         dto.setEstActif(personnel.getEstActif());
         return dto;
     }
-    
+
     private CitoyenDTO convertToCitoyenDTO(Citoyen citoyen) {
         CitoyenDTO dto = new CitoyenDTO();
         dto.setCin(citoyen.getCin());
@@ -146,7 +152,7 @@ public class PersonnelService {
         dto.setPhotoUrl(citoyen.getPhotoUrl());
         return dto;
     }
-    
+
     private Citoyen convertToCitoyen(CitoyenDTO dto) {
         Citoyen citoyen = new Citoyen();
         citoyen.setCin(dto.getCin());
@@ -164,4 +170,3 @@ public class PersonnelService {
         return citoyen;
     }
 }
-

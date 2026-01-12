@@ -45,6 +45,8 @@ class AbsenceListFragment : Fragment() {
         arguments?.getString("absenceType")?.let { typeString ->
             if (typeString.isNotEmpty()) {
                 currentAbsenceType = AbsenceType.valueOf(typeString)
+                // Restreindre immédiatement le ViewModel à ce type
+                viewModel.filterAbsencesByType(typeString)
             }
         }
 
@@ -53,7 +55,7 @@ class AbsenceListFragment : Fragment() {
         setupObservers()
         setupSearch()
 
-        // Charger les données
+        // Charger les données (applyFilters sera appelé automatiquement à la fin du chargement)
         loadInitialData()
     }
 
@@ -76,17 +78,13 @@ class AbsenceListFragment : Fragment() {
     }
 
     private fun setupUI() {
-        // Configuration du titre selon le type
-        binding.toolbar.title = when (currentAbsenceType) {
-            AbsenceType.CONGE_ANNUEL -> "Gestion des Congés"
-            AbsenceType.MALADIE -> "Gestion des Absences Maladie"
+        // Configuration du sous-titre selon le type
+        binding.tvListSubtitle.text = when (currentAbsenceType) {
+            AbsenceType.CONGE_ANNUEL -> "Congés annuels"
+            AbsenceType.MALADIE -> "Absences Maladie"
             AbsenceType.EXCEPTIONNELLE -> "Absences Exceptionnelles"
             AbsenceType.NON_JUSTIFIEE -> "Absences Non Justifiées"
             null -> "Toutes les Absences"
-        }
-
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
         }
 
         // Bouton d'ajout - passe le type d'absence
@@ -140,38 +138,27 @@ class AbsenceListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        // Observer les absences
+        // Observer le chargement
+        viewModel.isLoading.observe(viewLifecycleOwner) { isLoading ->
+            binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+        }
+
+        // Observer les absences filtrées (inclut la recherche)
+        viewModel.filteredAbsences.observe(viewLifecycleOwner) { filteredList ->
+            absenceAdapter.submitList(filteredList.toList())
+            
+            binding.tvEmptyState.visibility = if (filteredList.isEmpty()) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+            updateStatistics(filteredList)
+        }
+
+        // Observer les erreurs depuis le résultat brut si besoin
         viewModel.absences.observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is NetworkResult.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                }
-                is NetworkResult.Success -> {
-                    binding.progressBar.visibility = View.GONE
-
-                    // Appliquer le filtre par type si nécessaire
-                    val absences = result.data ?: emptyList()
-                    val filteredAbsences = if (currentAbsenceType != null) {
-                        absences.filter { it.type == currentAbsenceType }
-                    } else {
-                        absences
-                    }
-
-                    // Mettre à jour la liste directement
-                    absenceAdapter.submitList(filteredAbsences.toList())
-
-                    binding.tvEmptyState.visibility = if (filteredAbsences.isEmpty()) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    }
-                    updateStatistics(filteredAbsences)
-                }
-                is NetworkResult.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.tvEmptyState.visibility = View.VISIBLE
-                    showErrorDialog(result.message ?: "Erreur inconnue")
-                }
+            if (result is NetworkResult.Error) {
+                showErrorDialog(result.message ?: "Erreur inconnue")
             }
         }
 
@@ -179,10 +166,9 @@ class AbsenceListFragment : Fragment() {
         viewModel.absenceOperation.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is NetworkResult.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
+                    // Handled by viewModel.isLoading
                 }
                 is NetworkResult.Success -> {
-                    binding.progressBar.visibility = View.GONE
                     Snackbar.make(
                         binding.root,
                         "Opération réussie",
@@ -192,11 +178,10 @@ class AbsenceListFragment : Fragment() {
                     // Recharger après un court délai
                     Handler(Looper.getMainLooper()).postDelayed({
                         loadInitialData()
-                        absenceAdapter.notifyDataSetChanged()
                     }, 300)
                 }
                 is NetworkResult.Error -> {
-                    binding.progressBar.visibility = View.GONE
+                    // Handled by viewModel.isLoading for progress bar
                     showErrorDialog(result.message ?: "Erreur inconnue")
                 }
                 else -> {}

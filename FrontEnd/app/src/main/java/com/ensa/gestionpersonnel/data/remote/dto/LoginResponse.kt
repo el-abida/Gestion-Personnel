@@ -5,9 +5,10 @@ package com.ensa.gestionpersonnel.data.remote.dto
  * Adaptée au modèle métier du backend Spring Boot.
  */
 data class LoginResponse(
-    val token: String,
-    val userId: Long,
+    val id: Long,
     val nom: String,
     val prenom: String,
-    val email: String
+    val email: String,
+    val username: String,
+    val token: String
 )

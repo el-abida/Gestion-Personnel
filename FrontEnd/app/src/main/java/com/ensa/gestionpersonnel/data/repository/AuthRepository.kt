@@ -18,6 +18,17 @@ class AuthRepository @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
                 preferencesManager.saveToken(body.token)
+                
+                // Sauvegarder aussi les infos du profil pour ProfileViewModel
+                val profile = com.ensa.gestionpersonnel.domain.model.ResponsableRH(
+                    id = body.id,
+                    nom = body.nom,
+                    prenom = body.prenom,
+                    email = body.email,
+                    username = body.username
+                )
+                preferencesManager.saveRhProfile(profile)
+                
                 NetworkResult.Success(body)
             } else {
                 NetworkResult.Error("Identifiants invalides")

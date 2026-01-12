@@ -53,9 +53,7 @@ class AbsenceDetailFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
+
 
         binding.btnDelete.setOnClickListener {
             showDeleteConfirmation()

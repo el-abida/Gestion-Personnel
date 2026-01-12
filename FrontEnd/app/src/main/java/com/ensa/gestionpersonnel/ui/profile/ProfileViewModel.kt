@@ -5,7 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ensa.gestionpersonnel.data.local.PreferencesManager
+import com.ensa.gestionpersonnel.data.repository.ProfileRepository
 import com.ensa.gestionpersonnel.domain.model.ResponsableRH
+import com.ensa.gestionpersonnel.utils.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -13,6 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    private val profileRepository: ProfileRepository,
     private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
@@ -25,7 +28,6 @@ class ProfileViewModel @Inject constructor(
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-    // Initialiser avec une valeur par défaut
     init {
         _isLoading.value = false
         _updateSuccess.value = null
@@ -34,55 +36,38 @@ class ProfileViewModel @Inject constructor(
     fun loadProfile() {
         viewModelScope.launch {
             _isLoading.value = true
-            try {
-                // Essayer de charger depuis le stockage local
-                val savedProfile = preferencesManager.getRhProfile()
-                if (savedProfile != null) {
-                    _profile.value = savedProfile
-                } else {
-                    // Données par défaut si pas encore sauvegardé
-                    val defaultProfile = ResponsableRH(
-                        id = 1,
-                        nom = "EL FAHSSI",
-                        prenom = "Chaymae",
-                        email = "chaymae@ensa.ma",
-                        username = "chaymae.rh"
-                    )
-                    _profile.value = defaultProfile
-                    // Sauvegarder les données par défaut
-                    preferencesManager.saveRhProfile(defaultProfile)
+            
+            // Récupérer le profil local
+            val localProfile = preferencesManager.getRhProfile()
+            if (localProfile != null) {
+                _profile.value = localProfile
+                
+                // Charger les données fraîches du backend avec le bon ID
+                val result = profileRepository.getProfile(localProfile.id)
+                if (result is NetworkResult.Success) {
+                    _profile.value = result.data
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                // En cas d'erreur, charger les valeurs par défaut
-                val defaultProfile = ResponsableRH(
-                    id = 1,
-                    nom = "EL FAHSSI",
-                    prenom = "Chaymae",
-                    email = "chaymae@ensa.ma",
-                    username = "chaymae.rh"
-                )
-                _profile.value = defaultProfile
-            } finally {
-                _isLoading.value = false
+            } else {
+                // Si pas de session, on ne fait rien (l'utilisateur devrait être redirigé vers login)
             }
+            
+            _isLoading.value = false
         }
     }
 
     fun updateProfile(newRH: ResponsableRH) {
         viewModelScope.launch {
             _isLoading.value = true
-            try {
-                // Sauvegarder dans le stockage local
-                preferencesManager.saveRhProfile(newRH)
-                _profile.value = newRH
+            val result = profileRepository.updateProfile(newRH.id, newRH)
+            
+            if (result is NetworkResult.Success) {
+                _profile.value = result.data
                 _updateSuccess.value = true
-            } catch (e: Exception) {
-                e.printStackTrace()
+            } else {
                 _updateSuccess.value = false
-            } finally {
-                _isLoading.value = false
             }
+            
+            _isLoading.value = false
         }
     }
 }

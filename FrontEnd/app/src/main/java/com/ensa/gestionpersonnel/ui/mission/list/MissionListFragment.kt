@@ -66,15 +66,12 @@ class MissionListFragment : Fragment() {
     }
 
     private fun setupSearchView() {
-        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                return false
+        binding.etSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.searchMissions(s?.toString() ?: "")
             }
-
-            override fun onQueryTextChange(newText: String?): Boolean {
-                newText?.let { viewModel.searchMissions(it) }
-                return true
-            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
         })
     }
 

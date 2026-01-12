@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.ensa.gestionpersonnel.R
 import com.ensa.gestionpersonnel.databinding.FragmentDashboardBinding
 import com.ensa.gestionpersonnel.data.remote.dto.DashboardStats
 import com.ensa.gestionpersonnel.utils.NetworkResult
@@ -70,9 +72,12 @@ class DashboardFragment : Fragment() {
     private fun updateUI(stats: DashboardStats) {
         binding.tvTotalPersonnel.text = stats.totalPersonnel.toString()
         binding.tvPersonnelActif.text = stats.personnelActif.toString()
-        binding.tvPersonnelInactif.text = stats.personnelInactif.toString()
-        binding.tvMoyenneAnciennete.text = stats.moyenneAnciennete.toString()
-        binding.tvTotalConges.text = stats.totalConges.toString()
+        binding.tvMoyenneAnciennete.text = "${stats.moyenneAnciennete} ans"
+        binding.tvTotalConges.text = "${stats.totalConges} j"
+        
+        binding.tvAbsencesEnCours.text = stats.absencesEnCours.toString()
+        binding.tvMissionsEnCours.text = stats.missionsEnCours.toString()
+        binding.tvAvancementsAnnee.text = stats.avancementsAnnee.toString()
         
         setupPieChart(stats.repartitionParType)
     }

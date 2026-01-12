@@ -32,10 +32,7 @@ class AbsenceMenuFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.toolbar.title = "Gestion des Absences"
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigate(R.id.action_absenceMenu_to_dashboard)
-        }
+
 
         // Option 1: Gérer les congés
         binding.cardConges.setOnClickListener {

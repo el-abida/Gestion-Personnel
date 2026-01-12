@@ -42,10 +42,6 @@ class ProfileRHFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.toolbar.setNavigationOnClickListener {
-            findNavController().navigateUp()
-        }
-
         binding.btnUpdateProfile.setOnClickListener {
             if (validateInputs()) {
                 showSaveConfirmation()
@@ -102,8 +98,6 @@ class ProfileRHFragment : Fragment() {
 
     private fun setupTextChangeListeners() {
         listOf(
-            binding.edtNom,
-            binding.edtPrenom,
             binding.edtUsername,
             binding.edtEmail
         ).forEach { textInputLayout ->
@@ -117,18 +111,24 @@ class ProfileRHFragment : Fragment() {
     private fun validateInputs(): Boolean {
         var isValid = true
 
-        if (binding.edtNom.editText?.text.toString().trim().isEmpty()) {
-            binding.edtNom.error = "Le nom est requis"
+        val username = binding.edtUsername.editText?.text.toString().trim()
+        val email = binding.edtEmail.editText?.text.toString().trim()
+
+        if (username.isEmpty()) {
+            binding.edtUsername.error = "Le nom d'utilisateur est requis"
             isValid = false
         } else {
-            binding.edtNom.error = null
+            binding.edtUsername.error = null
         }
 
-        if (binding.edtPrenom.editText?.text.toString().trim().isEmpty()) {
-            binding.edtPrenom.error = "Le prénom est requis"
+        if (email.isEmpty()) {
+            binding.edtEmail.error = "L'email est requis"
+            isValid = false
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.edtEmail.error = "Format d'email invalide"
             isValid = false
         } else {
-            binding.edtPrenom.error = null
+            binding.edtEmail.error = null
         }
 
         return isValid
@@ -162,14 +162,13 @@ class ProfileRHFragment : Fragment() {
     }
 
     private fun saveProfile() {
-        val newProfile = com.ensa.gestionpersonnel.domain.model.ResponsableRH(
-            id = 1,
-            nom = binding.edtNom.editText?.text.toString().trim(),
-            prenom = binding.edtPrenom.editText?.text.toString().trim(),
+        val currentProfile = viewModel.profile.value ?: return
+        
+        val updatedProfile = currentProfile.copy(
             username = binding.edtUsername.editText?.text.toString().trim(),
             email = binding.edtEmail.editText?.text.toString().trim()
         )
-        viewModel.updateProfile(newProfile)
+        viewModel.updateProfile(updatedProfile)
     }
 
     override fun onDestroyView() {
