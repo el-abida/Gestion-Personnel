@@ -72,7 +72,7 @@ class MissionAdapter(
                 }
                 StatutMission.EN_COURS -> {
                     tvStatut.text = "EN COURS"
-                    tvStatut.setBackgroundResource(R.drawable.bg_status_validated)
+                    tvStatut.setBackgroundResource(R.drawable.bg_status_ongoing)
                 }
                 StatutMission.TERMINEE -> {
                     tvStatut.text = "TERMINÉE"
@@ -80,7 +80,7 @@ class MissionAdapter(
                 }
                 StatutMission.ANNULEE -> {
                     tvStatut.text = "ANNULÉE"
-                    tvStatut.setBackgroundResource(R.drawable.bg_status_pending)
+                    tvStatut.setBackgroundResource(R.drawable.bg_status_canceled)
                 }
             }
 

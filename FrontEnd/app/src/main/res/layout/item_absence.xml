@@ -79,13 +79,6 @@
             android:orientation="horizontal"
             android:layout_marginBottom="4dp">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_calendar"
-                android:tint="@color/colorPrimary"
-                android:layout_marginEnd="8dp" />
-
             <TextView
                 android:id="@+id/tvPeriod"
                 android:layout_width="0dp"
@@ -111,7 +104,7 @@
             android:id="@+id/tvSoldeConges"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="💼 Solde: 30 jours"
+            android:text="Solde: 30 jours"
             android:textSize="14sp"
             android:textStyle="bold"
             android:layout_marginBottom="8dp"
@@ -123,13 +116,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="8dp">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_note"
-                android:tint="@color/colorTextSecondary"
-                android:layout_marginEnd="8dp" />
 
             <TextView
                 android:id="@+id/tvMotif"
@@ -181,13 +167,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="12dp">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_attachment"
-                android:tint="@color/colorAccent"
-                android:layout_marginEnd="8dp" />
 
             <TextView
                 android:id="@+id/tvJustificatif"

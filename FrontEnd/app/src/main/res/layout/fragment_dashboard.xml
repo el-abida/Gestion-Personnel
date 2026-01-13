@@ -287,7 +287,6 @@
             android:layout_height="wrap_content"
             android:text="Actualiser les données"
             style="@style/Widget.Material3.Button.TextButton"
-            app:icon="@drawable/ic_search"
             android:layout_marginBottom="32dp"/>
 
     </LinearLayout>

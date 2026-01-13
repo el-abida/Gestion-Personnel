@@ -77,19 +77,19 @@ class AbsenceAdapter(
                 // Type avec emoji
                 when (absence.type) {
                     AbsenceType.CONGE_ANNUEL -> {
-                        tvType.text = "🏖️ Congé Annuel"
+                        tvType.text = "Congé Annuel"
                         tvType.setChipBackgroundColorResource(R.color.blue_light)
                     }
                     AbsenceType.MALADIE -> {
-                        tvType.text = "🏥 Maladie"
+                        tvType.text = "Maladie"
                         tvType.setChipBackgroundColorResource(R.color.red_light)
                     }
                     AbsenceType.EXCEPTIONNELLE -> {
-                        tvType.text = "⚠️ Exceptionnelle"
+                        tvType.text = "Exceptionnelle"
                         tvType.setChipBackgroundColorResource(R.color.orange_light)
                     }
                     AbsenceType.NON_JUSTIFIEE -> {
-                        tvType.text = "❌ Non Justifiée"
+                        tvType.text = "Non Justifiée"
                         tvType.setChipBackgroundColorResource(R.color.gray_light)
                     }
                 }
@@ -98,7 +98,7 @@ class AbsenceAdapter(
 
                 if (absence.personnelSolde != null) {
                     tvSoldeConges.visibility = View.VISIBLE
-                    tvSoldeConges.text = "💼 Solde: ${absence.personnelSolde} j"
+                    tvSoldeConges.text = "Solde: ${absence.personnelSolde} j"
                     val color = when {
                         absence.personnelSolde < 5 -> android.R.color.holo_red_dark
                         absence.personnelSolde < 15 -> android.R.color.holo_orange_dark
@@ -111,12 +111,12 @@ class AbsenceAdapter(
 
                 // Badge de statut
                 if (absence.estValideeParAdmin) {
-                    tvStatus.text = "✅ Validée"
+                    tvStatus.text = "Validée"
                     tvStatus.setBackgroundResource(R.drawable.bg_status_validated)
                     tvStatus.setTextColor(root.context.getColor(android.R.color.white))
                     btnValidate.visibility = View.GONE
                 } else {
-                    tvStatus.text = "⏳ En attente"
+                    tvStatus.text = "En attente"
                     tvStatus.setBackgroundResource(R.drawable.bg_status_pending)
                     tvStatus.setTextColor(root.context.getColor(android.R.color.white))
                     btnValidate.visibility = View.VISIBLE
@@ -126,7 +126,7 @@ class AbsenceAdapter(
                 // Justificatif
                 if (absence.justificatifUrl != null) {
                     tvJustificatif.visibility = View.VISIBLE
-                    tvJustificatif.text = "📎 Justificatif présent"
+                    tvJustificatif.text = "Justificatif présent"
                 } else {
                     tvJustificatif.visibility = View.GONE
                 }

@@ -169,11 +169,14 @@ class MissionDetailFragment : Fragment() {
             StatutMission.PLANIFIEE -> {
                 binding.tvStatut.setBackgroundResource(R.drawable.bg_status_pending)
             }
-            StatutMission.EN_COURS, StatutMission.TERMINEE -> {
+            StatutMission.EN_COURS -> {
+                binding.tvStatut.setBackgroundResource(R.drawable.bg_status_ongoing)
+            }
+            StatutMission.TERMINEE -> {
                 binding.tvStatut.setBackgroundResource(R.drawable.bg_status_validated)
             }
             StatutMission.ANNULEE -> {
-                binding.tvStatut.setBackgroundResource(R.drawable.bg_status_pending)
+                binding.tvStatut.setBackgroundResource(R.drawable.bg_status_canceled)
             }
         }
 
